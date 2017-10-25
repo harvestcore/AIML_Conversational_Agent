@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+
+
+<!-- MISC -->
+<category>
+    <pattern>Hola</pattern>
+    <template>Hola</template>
+</category>
+
+<category>
+    <pattern>Hola # $buenos $dias</pattern>
+    <template>
+        <random>
+            <li>Hola, que tal?</li>
+            <li>Suh dude</li>
+        </random>
+    </template>
+</category>
+
+<category>
+    <pattern># que tal tu</pattern>
+    <template>Yo estoy bien, gracias.</template>
+</category>
+
+<category>
+    <pattern># como te llamas</pattern>
+    <template>Mi nombre es @BotPerrete</template>
+</category>
+
+<category>
+    <pattern>cual es tu nombre</pattern>
+    <template><srai>COMO TE LLAMAS</srai></template>
+</category>
+
+<category>
+    <pattern># me llamo *</pattern>
+    <template>
+        <set name="nombre"><star index="2"/></set>, lindo nombre.
+    </template>
+</category>
+
+<category>
+    <pattern>mi nombre es</pattern>
+    <template>
+        <condition name="nombre">
+            <li value="unknown">Aun no me has dicho tu nombre.</li>
+            <li>Te llamas <get name="nombre"/>.</li>
+        </condition>
+    </template>
+</category>
+
+<category>
+    <pattern># (muchas) gracias</pattern>
+    <template>
+        <random>
+            <li>De nada.</li>
+            <li>No hay de que.</li>
+            <li>Sin problemas.</li>
+        </random>
+    </template>
+</category>
+
+<category>
+    <pattern>como me llamo</pattern>
+    <template><srai>MI NOMBRE ES</srai></template>
+</category>
+
+<category>
+    <pattern># mi nombre</pattern>
+    <template><srai>MI NOMBRE ES</srai></template>
+</category>
+
+<category>
+    <pattern>mi color favorito es el *</pattern>
+    <template>
+        <think><set var="color"><star/></set></think>
+        El <get var="color"/> a mi no me gusta.
+    </template>
+</category>
+
+<category>
+    <pattern>Que edad tienes</pattern>
+    <template>Tengo <bot name="age"/> años.</template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <template>
+        <random>
+            <li>No entiendo que quieres decir.</li>
+            <li>No comprendo lo que escribes. Escribe "help" si necesitas ayuda.</li>
+            <li>Comando incorrecto o inexistente.</li>
+        </random>
+    </template>
+</category>
+
+<category>
+    <pattern>help</pattern>
+    <template>
+        Bienvenido al asistente personal @BotPerrete.
+        Las funciones que puedo realizar son las siguientes:
+        - Gestionar una agenda de contactos; (crear, borrar, modificar...).
+        - Gestionar una agenda de eventos; (crear, borrar, modificar...).
+        - Responder a cuestiones mas complejas acerca de eventos.
+
+        Información del BotMaster con el comando "botmaster".
+    </template>
+</category>
+
+<category>
+    <pattern>botmaster</pattern>
+    <template>
+        Bot creado por Ángel Gómez Martín.
+        email: agomezm@correo.ugr.es
+        75570479-T
+        2ºD, Inteligencia Artificial
+        ETSIIT 2016-2017
+
+        El bot forma parte de la práctica Nº3 de la asignatura IA.
+    </template>
+</category>
+
+<!-- FIN MISC -->
+
+
+</aiml>

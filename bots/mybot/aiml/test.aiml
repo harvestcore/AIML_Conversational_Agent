@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+
+
+<!-- COLOR -->
+<category>
+    <pattern>Es <set>color</set> un color</pattern>
+    <template>Sí, <star/> es un color.</template>
+</category>
+
+<category>
+    <pattern>Es * un color</pattern>
+    <template>No, <star/> no es un color.</template>
+</category>
+<!-- FIN COLOR -->
+
+
+<!-- CAPITAL -->
+<category>
+    <pattern>Cual es la capital de <set>pais</set></pattern>
+    <template>La capital de <star/> es <map name="capital"><star/></map>.</template>
+</category>
+
+<category>
+    <pattern>Cual es la capital de *</pattern>
+    <template>No lo se</template>
+</category>
+
+<category>
+    <pattern>la capital de * es *</pattern>
+    <template>
+        <think>
+            <set var="cap"><srai>CUAL ES LA CAPITAL DE <star/></srai></set>
+        </think>
+        <condition var="cap">
+            <li value="NO LO SE">
+            <learn>
+                <category>
+                <pattern>
+                    CUAL ES LA CAPITAL DE <eval><star/></eval>
+                </pattern>
+                <template>
+                    La capital de <eval><star/></eval> es <eval><star index="2"/></eval>
+                </template>
+                </category>
+            </learn>
+            Recordare que la capital de <star/> es <star index="2"/>.
+            </li>
+            <li>
+            Ya lo sabia.
+            </li>
+        </condition>
+    </template>
+</category>
+<!-- FIN CAPITAL -->
+
+
+<!-- ADD MAP -->
+<category>
+    <pattern>add * *</pattern>
+    <template>
+        <think>
+
+            <addtomap>
+                <name>test</name>
+                <key><star index="1"/></key>
+                <value><star index="2"/></value>
+            </addtomap>
+
+            <set var="elementos">
+                <map name="data">testsize</map>
+            </set>
+
+            <set var="sig_elementos">
+                <map name="successor"><get var="elementos"/></map>
+            </set>
+
+            <modifymap>
+                <name>data</name>
+                <key>testsize</key>
+                <value><get var="sig_elementos"/></value>
+            </modifymap>
+
+        </think>
+        added
+    </template>
+</category>
+
+<category>
+    <pattern>value</pattern>
+    <template>
+        <think>
+            <set var="values"><readkeys>test</readkeys></set>
+        </think>
+        Hay <get var="values"/> entradas.
+    </template>
+</category>
+
+<category>
+    <pattern>delete *</pattern>
+    <template>
+        <removefrommap>
+            <name>test</name>
+            <key><star index="1"/></key>
+        </removefrommap>
+        deleted
+    </template>
+</category>
+<!-- END ADD MAP -->
+
+
+<!-- BUSQUEDA -->
+<category>
+    <pattern>busca en test *</pattern>
+    <template>
+        <map name="test">
+            <star index="1"/>
+        </map>
+    </template>
+</category>
+
+<category>
+    <pattern>busca en direccion *</pattern>
+    <template>
+        <map name="direccion">
+            <star index="1"/>
+        </map>
+    </template>
+</category>
+
+<category>
+    <pattern>busca en nombre *</pattern>
+    <template>
+        <map name="nombre">
+            <star index="1"/>
+        </map>
+    </template>
+</category>
+
+<category>
+    <pattern>busca en telefono *</pattern>
+    <template>
+        <map name="telefono">
+            <star index="1"/>
+        </map>
+    </template>
+</category>
+<!-- FIN BUSQUEDA -->
+
+
+<!-- BORRADO -->
+<category>
+    <pattern>borra en nombre *</pattern>
+    <template>
+        <removefrommap>
+            <name>nombre</name>
+            <key><star/></key>
+        </removefrommap>
+        borrado
+    </template>
+</category>
+
+<category>
+    <pattern>borra en direccion *</pattern>
+    <template>
+        <removefrommap>
+            <name>nombre</name>
+            <key><star/></key>
+        </removefrommap>
+        borrado
+    </template>
+</category>
+
+<category>
+    <pattern>borra en telefono *</pattern>
+    <template>
+        <removefrommap>
+            <name>telefono</name>
+            <key><star/></key>
+        </removefrommap>
+        borrado
+    </template>
+</category>
+<!-- FIN BORRADO -->
+
+
+<category>
+    <pattern>fecha *</pattern>
+    <template>
+        <addtomap>
+            <name>test</name>
+            <key><star/></key>
+            <value><date jformat="01/01/2020"/></value>
+        </addtomap>
+        ok
+    </template>
+</category>
+
+<category>
+    <pattern>barra *</pattern>
+    <template>
+        <think>
+            <set var="barra"> <srai> ponerbarrabaja <star/></srai> </set>
+        </think>
+        <get var="barra"/>
+    </template>
+</category>
+
+
+<category>
+    <pattern>addmap * * *</pattern>
+    <template>
+        <addtomap>
+            <name><star index="3"/></name>
+            <key><star index="2"/></key>
+            <value><star index="1"/></value>
+        </addtomap>
+        <map>
+            <name><star index="3"/></name>
+            <key><star index="2"/></key>
+        </map>
+    </template>
+</category>
+
+<category>
+    <pattern>horatest *</pattern>
+    <template>
+        <srai>hora2num <star/></srai>
+    </template>
+</category>
+
+
+<category>
+    <pattern>espacio *</pattern>
+    <template>
+        <think>
+            <set var="espacio"> <srai> quitarespacios <star/></srai> </set>
+        </think>
+        <get var="espacio"/>
+    </template>
+</category>
+
+
+</aiml>

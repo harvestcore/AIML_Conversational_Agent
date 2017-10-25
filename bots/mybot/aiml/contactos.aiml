@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+
+<!-- AGREGAR CONTACTO -->
+<category>
+    <pattern># agregar # contacto #</pattern>
+    <template>Perfecto, dime su apellido.</template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>PERFECTO, DIME SU APELLIDO</that>
+        <template>
+            <think>
+                <set name="apellido"><srai> ponerbarrabaja <star index="1"/> </srai></set>
+                <set var="apellido_map"><map name="nombre"><get name="apellido"/></map></set>
+            </think>
+
+            <condition var="apellido_map">
+                <li value="unknown">
+                    Ahora dime su nombre.
+                </li>
+                <li>Ya tienes un contacto con ese apellido.</li>
+            </condition>
+
+        </template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>AHORA DIME SU NOMBRE</that>
+        <template>
+            <think>
+                <set var="name"><srai> ponerbarrabaja <star/> </srai></set>
+            </think>
+            <addtomap>
+                <name>nombre</name>
+                <key><get name="apellido"/></key>
+                <value><get var="name"/></value>
+            </addtomap>
+            Correcto, dime su numero de telefono.
+        </template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>CORRECTO, DIME SU NUMERO DE TELEFONO</that>
+        <template>
+            <think>
+                <addtomap>
+                    <name>telefono</name>
+                    <key><get name="apellido"/></key>
+                    <value><star index="1"/></value>
+                </addtomap>
+            </think>
+            Genial, por ultimo dime su direccion.
+        </template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>GENIAL, POR ULTIMO DIME SU DIRECCION</that>
+        <template>
+            <think>
+                <set var="direccion"> <srai> ponerbarrabaja <star/> </srai></set>
+                <addtomap>
+                    <name>direccion</name>
+                    <key><get name="apellido"/></key>
+                    <value><get var="direccion"/></value>
+                </addtomap>
+            </think>
+            Perfecto, todo correcto.
+        </template>
+</category>
+<!-- FIN AÑADIR CONTACTO -->
+
+
+<!-- CONTACTOS ALMACENADOS -->
+<category>
+    <pattern># contactos # (almacenados) (tengo) #</pattern>
+        <template>
+            <think>
+                <set var="numElementos"><srai>COUNT <readkeys>nombre</readkeys> </srai></set>
+            </think>
+            Tienes <get var="numElementos"/> contacto/s almacenados.
+        </template>
+</category>
+<!-- FIN CONTACTOS ALMACENADOS -->
+
+
+<!-- LISTAR ALMACENADOS -->
+<category>
+    <pattern># list+ # contactos (almacenados) #</pattern>
+        <template>
+            <readkeys>nombre</readkeys>
+        </template>
+</category>
+<!-- FIN LISTAR ALMACENADOS -->
+
+
+<!-- BORRAR CONTACTO POR APELLIDO -->
+<category>
+    <pattern># borra+ # contacto #</pattern>
+    <template>Borrar un contacto, perfecto, dime su apellido.</template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>BORRAR UN CONTACTO, PERFECTO, DIME SU APELLIDO</that>
+    <template>
+        <think>
+            <set name="apellido_borrar"><srai> ponerbarrabaja <star index="1"/> </srai></set>
+            <set var="delete_apellido"><map name="nombre"><get name="apellido_borrar"/></map></set>
+        </think>
+        <condition var="delete_apellido">
+            <li value="unknown"> No tienes ningun contacto con ese apellido.</li>
+            <li>Esta usted seguro de querer borrar el contacto?</li>
+        </condition>
+    </template>
+</category> 
+
+<category>
+    <pattern>si</pattern>
+    <that>ESTA USTED SEGURO DE QUERER BORRAR EL CONTACTO</that>
+    <template>
+        <removefrommap>
+            <name>nombre</name>
+            <key><get name="apellido_borrar"/></key>
+        </removefrommap>
+        <removefrommap>
+            <name>telefono</name>
+            <key><get name="apellido_borrar"/></key>
+        </removefrommap>
+        <removefrommap>
+            <name>direccion</name>
+            <key><get name="apellido_borrar"/></key>
+        </removefrommap>
+        Contacto borrado.
+    </template>
+</category> 
+
+<category>
+    <pattern>no</pattern>
+    <that>ESTA USTED SEGURO</that>
+    <template>Contacto no borrado.</template>
+</category>
+<!-- FIN BORRAR CONTACTO POR APELLIDO -->
+
+
+<!-- MODIFICAR CONTACTO -->
+<category>
+    <pattern># modificar # contacto #</pattern>
+    <template>Claro, dime el apellido del contacto</template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>CLARO, DIME EL APELLIDO DEL CONTACTO</that>
+    <template>
+        <think>
+            <set name="apellido_modificar"><srai> ponerbarrabaja <star/> </srai></set>
+            <set var="modify_apellido"><map name="nombre"><get name="apellido_modificar"/></map></set>
+        </think>
+        <condition var="modify_apellido">
+            <li value="unknown"> No tienes ningun contacto con ese apellido.</li>
+            <li>Que quieres modificar?</li>
+        </condition>
+    </template>
+</category>
+
+<category>
+    <pattern># nombre #</pattern>
+    <that>QUE QUIERES MODIFICAR</that>
+    <template>Dime el nuevo nombre.</template>
+</category>
+
+<category>
+    <pattern># telefono #</pattern>
+    <that>QUE QUIERES MODIFICAR</that>
+    <template>Dime el nuevo numero.</template>
+</category>
+
+<category>
+    <pattern># direccion #</pattern>
+    <that>QUE QUIERES MODIFICAR</that>
+    <template>Dime la nueva direccion.</template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>DIME EL NUEVO NOMBRE</that>
+        <template>
+            <think>
+                <modifymap>
+                    <name>nombre</name>
+                    <key><get name="apellido_modificar"/></key>
+                    <value><srai> ponerbarrabaja <star index="1"/> </srai></value>
+                </modifymap>
+            </think>
+            Contacto modificado correctamente.
+        </template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>DIME EL NUEVO NUMERO</that>
+        <template>
+            <think>
+                <modifymap>
+                    <name>telefono</name>
+                    <key><get name="apellido_modificar"/></key>
+                    <value><srai> ponerbarrabaja <star index="1"/> </srai></value>
+                </modifymap>
+            </think>
+            Contacto modificado correctamente.
+        </template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>DIME LA NUEVA DIRECCION</that>
+        <template>
+            <think>
+                <modifymap>
+                    <name>direccion</name>
+                    <key><get name="apellido_modificar"/></key>
+                    <value><srai> ponerbarrabaja <star index="1"/> </srai></value>
+                </modifymap>
+            </think>
+            Contacto modificado correctamente.
+        </template>
+</category>
+<!-- FIN MODIFICAR CONTACTO -->
+
+
+<!-- BUSCAR POR APELLIDO -->
+<category>
+    <pattern>dime [el la] * de *</pattern>
+    <template>
+        <think>
+            <set name="apellido_info"><srai> ponerbarrabaja <star index="2"/> </srai></set>
+            <set var="dato_info"><star index="1"/></set>
+            <set var="nombre_info"> <map name="nombre"><get name="apellido_info"/></map></set>          
+        </think>
+
+        <condition var="nombre_info">
+            <li value="unknown">No tienes ningun contacto con ese apellido.</li>
+            <li>
+                <condition var="dato_info">
+                    <li value="nombre">El contacto se llama <srai> quitarespacios <map name="nombre"><get name="apellido_info"/></map> </srai></li>
+                    <li value="telefono">El numero de telefono de <srai> quitarespacios <get name="apellido_info"/> </srai> es <map name="telefono"><get name="apellido_info"/></map></li>
+                    <li value="numero">El numero de telefono de <srai> quitarespacios <get name="apellido_info"/> </srai> es <map name="telefono"><get name="apellido_info"/></map></li>
+                    <li value="direccion">La direccion de <srai> quitarespacios <get name="apellido_info"/> </srai> es <srai> quitarespacios <map name="direccion"><get name="apellido_info"/></map> </srai></li>
+                </condition>
+            </li>
+        </condition>
+    </template>
+</category>
+
+<category>
+    <pattern># resumen # contacto #</pattern>
+        <template>Claro, dime el apellido.</template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+        <that>CLARO, DIME EL APELLIDO</that>
+        <template>
+            <think>
+                <set var="res"><map name="nombre"><srai> ponerbarrabaja <star/> </srai></map></set>
+            </think>
+            <condition var="res">
+                    <li value="unknown">No tienes un contacto con ese apellido.</li>
+                    <li>
+                        Nombre y apellidos: <srai> quitarespacios <map name="nombre"><srai> ponerbarrabaja <star/> </srai></map> </srai> <star/>
+       Telefono: <srai> quitarespacios <map name="telefono"><srai> ponerbarrabaja <star/> </srai></map> </srai>
+       Direccion: <srai> quitarespacios <map name="direccion"><srai> ponerbarrabaja <star/> </srai></map> </srai>
+                    </li>
+                </condition>
+        </template>
+</category>
+<!-- FIN BUSCAR POR APELLIDO -->
+
+</aiml>

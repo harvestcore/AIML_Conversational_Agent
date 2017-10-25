@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+
+
+<category>
+    <pattern>NEXTHOUR *</pattern>
+    <template>
+        <think>
+            <set var="1">1</set>
+            <set var="2">2</set>
+            <set var="time"><srai> quitarguion <star index="1"/></srai> </set>
+            <set var="horas"><srai>REMOVEITEM <get var="2"/> IN <get var="time"/></srai></set>
+            <set var="minutos"><srai>REMOVEITEM <get var="1"/> IN <get var="time"/></srai></set>
+            
+            <set var="minutos_where"><map name="hora_where"><get var="minutos"/></map></set>
+            
+            <condition var="minutos_where">
+                <li value="antes">
+                    <set var="prox_mins">30</set>
+                    <set var="prox_hora"><get var="horas"/></set>
+                </li>
+                <li value="despues">
+                    <set var="prox_mins">00</set>
+                    <condition var="horas">
+                        <li value="23">
+                            <set var="prox_hora">00</set>
+                        </li>
+                        <li>
+                            <set var="prox_hora"><map name="successor"><get var="horas"/></map></set>
+                        </li>
+                    </condition>
+                </li>
+            </condition>
+            <set var="next_hour"><srai> ponerguion <get var="prox_hora"/> <get var="prox_mins"/> </srai></set>
+        </think>
+        <get var="next_hour"/>
+    </template>
+</category>
+
+<category>
+    <pattern>ISTHISCONTACT * INTHISKEY *</pattern>
+    <template>
+        <think>
+            <set var="contact_"><star index="1"/></set>
+            <set var="key_"><star index="2"/></set>
+            <set var="assistants"><map name="evento_contactos"><get var="key_"/></map></set>
+            <set var="assistants_"><srai> quitarslash <get var="assistants"/> </srai></set>
+            <set var="position"><srai> FINDITEM <get var="contact_"/> IN <get var="assistants_"/> </srai></set>
+        </think>
+
+        <condition var="position">
+            <li value="0">NO</li>
+            <li><get var="position"/></li>
+        </condition>
+    </template>
+</category>
+
+<category>
+    <pattern>ADDCONTACT * TOKEY * </pattern>
+    <template>
+        <think>
+            <set var="contacto"><srai> ponerbarrabaja <star index="1"/> </srai></set>
+            <set var="key"><srai> ponerbarrabaja <star index="2"/> </srai></set>
+            <set var="en_agenda"><map name="nombre"><get var="contacto"/></map></set>
+        </think>
+
+        <condition var="en_agenda">
+            <li value="unknown">El contacto no está en la agenda.</li>
+            <li>
+                <think>
+                    <set var="used"><srai>ISTHISCONTACT <get var="contacto"/> INTHISKEY <get var="key"/></srai></set>
+                </think>
+                <condition var="used">
+                    <li value="YES">Ya está asociado ese contacto al evento.</li>
+                    <li value="NO">
+                        <think>
+                            <set var="assistants"><map name="evento_contactos"><get var="key"/></map></set>
+                            <set var="assistants_"><srai> quitarslash <get var="assistants"/> </srai></set>
+                            <set var="NEW_assistants"><srai> ADDITEM <get var="contacto"/> IN <get var="assistants"/> </srai></set>
+                            <set var="NEW_NEW_assistants"><srai> ponerslash <get var="NEW_assistants"/> </srai></set>
+                            
+                            <modifymap>
+                                <name>evento_contactos</name>
+                                <key><get var="key"/></key>
+                                <value><get var="NEW_NEW_assistants"/></value>
+                            </modifymap>
+                        </think>
+                    </li>
+                </condition>
+            </li>
+        </condition>
+    </template>
+</category>
+
+<category>
+    <pattern>DELETECONTACT * FROMKEY * </pattern>
+    <template>
+        <think>
+            <set var="contacto"><srai> ponerbarrabaja <star index="1"/> </srai></set>
+            <set var="key"><srai> ponerbarrabaja <star index="2"/> </srai></set>
+            <set var="en_evento"><srai>ISTHISCONTACT <get var="contacto"/> INTHISKEY <get var="key"/></srai></set>
+        </think>
+
+        <condition var="en_evento">
+            <li value="NO">El contacto no está en el evento.</li>
+            <li>
+                <think>
+                    <set var="assistants"><map name="evento_contactos"><get var="key"/></map></set>
+                    <set var="assistants_"><srai> quitarslash <get var="assistants"/> </srai></set>
+                    <set var="NEW_assistants"><srai>REMOVEITEM <get var="en_evento"/> IN <get var="assistants_"/> </srai></set>
+                    <set var="NEW_NEW_assistants"><srai> ponerslash <get var="NEW_assistants"/> </srai></set>
+                </think>
+                <modifymap>
+                    <name>evento_contactos</name>
+                    <key><get var="key"/></key>
+                    <value><get var="NEW_NEW_assistants"/></value>
+                </modifymap>
+            </li>
+        </condition>
+    </template>
+</category>
+
+
+<category>
+    <pattern>COUNTEVENTS * </pattern>
+    <template>
+        <think>
+            <set var="fecha_buscar"><srai> ponerslash <star index="1"/> </srai></set>
+            <set var="counter">0</set>
+            <set var="contador">1</set>
+        </think>
+
+        <condition var="contador">
+            <li value="48"><get var="counter"/></li>
+            <li>
+                <think>
+                    <set var="nueva_hora"><map name="hora"><get var="contador"/></map></set>
+                    <set var="nueva_key"><srai> ponerbarrabaja <get var="fecha_buscar"/> <get var="nueva_hora"/> </srai></set>
+                    <set var="esta"><map name="evento"><get var="nueva_key"/></map></set>
+
+                    <condition var="esta">
+                        <li value="unknown">
+                            <set var="contador"><map name="successor"><get var="contador"/></map></set>
+                        </li>
+                        <li>
+                            <set var="contador"><map name="successor"><get var="contador"/></map></set>
+                            <set var="counter"><map name="successor"><get var="counter"/></map></set>
+                        </li>
+                    </condition>
+                </think>
+                <loop/>
+            </li>
+        </condition>
+    </template>
+</category>
+
+<category>
+    <pattern>GETEVENTS * </pattern>
+    <template>
+        <think>
+            <set var="fecha_buscar"><srai> ponerslash <star index="1"/> </srai></set>
+            <set var="contador">1</set>
+        </think>
+
+        <condition var="contador">
+            <li value="48"><get var="eventos"/></li>
+            <li>
+                <think>
+                    <set var="nueva_hora"><map name="hora"><get var="contador"/></map></set>
+                    <set var="nueva_key"><srai> ponerbarrabaja <get var="fecha_buscar"/> <get var="nueva_hora"/> </srai></set>
+                    <set var="VALUE"><map name="evento"><get var="nueva_key"/></map></set>
+
+                    <condition var="VALUE">
+                        <li value="unknown">
+                            <set var="contador"><map name="successor"><get var="contador"/></map></set>
+                        </li>
+                        <li>
+                            <think>
+                                <set var="contador"><map name="successor"><get var="contador"/></map></set>
+                                <condition var="eventos">
+                                    <li value="unknown">
+                                        <set var="eventos"><get var="VALUE"/></set>
+                                    </li>
+
+                                    <li>
+                                        <set var="eventos"><get var="eventos"/>, <srai> quitarespacios <get var="VALUE"/> </srai></set>
+                                    </li>
+                                </condition>
+                            </think>
+                        </li>
+                    </condition>
+                </think>
+                <loop/>
+            </li>
+        </condition>
+    </template>
+</category>
+
+<category>
+    <pattern>GETFIRSTEVENT * </pattern>
+    <template>
+        <think>
+            <set var="fecha_buscar"><srai> ponerslash <star index="1"/> </srai></set>
+            <set var="contador">48</set>
+        </think>
+
+        <condition var="contador">
+            <li value="1"><get var="eventos"/></li>
+            <li>
+                <think>
+                    <set var="nueva_hora"><map name="hora"><get var="contador"/></map></set>
+                    <set var="nueva_key"><srai> ponerbarrabaja <get var="fecha_buscar"/> <get var="nueva_hora"/> </srai></set>
+                    <set var="VALUE"><map name="evento"><get var="nueva_key"/></map></set>
+
+                    <condition var="VALUE">
+                        <li value="unknown">
+                            <set var="contador"><map name="predecessor"><get var="contador"/></map></set>
+                        </li>
+                        <li>
+                            <think>
+                                <set var="contador"><map name="predecessor"><get var="contador"/></map></set>
+                                <condition var="eventos">
+                                    <li value="unknown">
+                                        <set var="eventos"><get var="VALUE"/></set>
+                                        <set name="hora_prox_evento"><get var="nueva_hora"/></set>
+                                    </li>
+
+                                    <li>
+                                        <set var="eventos"><srai> quitarespacios <get var="VALUE"/> </srai></set>
+                                        <set name="hora_prox_evento"><get var="nueva_hora"/></set>
+                                    </li>
+                                </condition>
+                            </think>
+                        </li>
+                    </condition>
+                </think>
+                <loop/>
+            </li>
+        </condition>
+    </template>
+</category>
+
+
+<category>
+    <pattern>GETLASTEVENT * </pattern>
+    <template>
+        <think>
+            <set var="fecha_buscar"><srai> ponerslash <star index="1"/> </srai></set>
+            <set var="contador">1</set>
+        </think>
+
+        <condition var="contador">
+            <li value="48"><get var="eventos"/></li>
+            <li>
+                <think>
+                    <set var="nueva_hora"><map name="hora"><get var="contador"/></map></set>
+                    <set var="nueva_key"><srai> ponerbarrabaja <get var="fecha_buscar"/> <get var="nueva_hora"/> </srai></set>
+                    <set var="VALUE"><map name="evento"><get var="nueva_key"/></map></set>
+
+                    <condition var="VALUE">
+                        <li value="unknown">
+                            <set var="contador"><map name="successor"><get var="contador"/></map></set>
+                        </li>
+                        <li>
+                            <think>
+                                <set var="contador"><map name="successor"><get var="contador"/></map></set>
+                                <condition var="eventos">
+                                    <li value="unknown">
+                                        <set var="eventos"><get var="VALUE"/></set>
+                                        <set name="hora_prox_evento"><get var="nueva_hora"/></set>
+                                    </li>
+
+                                    <li>
+                                        <set var="eventos"><srai> quitarespacios <get var="VALUE"/> </srai></set>
+                                        <set name="hora_prox_evento"><get var="nueva_hora"/></set>
+                                    </li>
+                                </condition>
+                            </think>
+                        </li>
+                    </condition>
+                </think>
+                <loop/>
+            </li>
+        </condition>
+    </template>
+</category>
+
+<category>
+    <pattern>GETEVENTDAY * AFTER *</pattern>
+    <template>
+        <think>
+            <set var="fecha_buscar"><srai> ponerslash <star index="1"/> </srai></set>
+            <set var="hora_buscar"><star index="2"/></set>
+            <set var="next_hour"><srai>NEXTHOUR <get var="hora_buscar"/></srai></set>
+            <set var="contador"><map name="hora"><srai> ponerslash <srai> quitarguion <get var="next_hour"/> </srai> </srai> </map></set>
+        </think>
+
+        <condition var="contador">
+            <li value="48"><get var="eventos"/></li>
+            <li>
+                <think>
+                    <set var="nueva_hora"><map name="hora"><get var="contador"/></map></set>
+                    <set var="nueva_key"><srai> ponerbarrabaja <get var="fecha_buscar"/> <get var="nueva_hora"/> </srai></set>
+                    <set var="VALUE"><map name="evento"><get var="nueva_key"/></map></set>
+
+                    <condition var="VALUE">
+                        <li value="unknown">
+                            <set var="contador"><map name="successor"><get var="contador"/></map></set>
+                        </li>
+                        <li>
+                            <think>
+                                <condition var="eventos">
+                                    <li value="unknown">
+                                        <set var="eventos"><get var="VALUE"/></set>
+                                        <set name="hora_prox_evento"><get var="nueva_hora"/></set>
+                                    </li>
+                                </condition>
+                                <set var="contador"><map name="successor"><get var="contador"/></map></set>
+                            </think>
+                        </li>
+                    </condition>
+                </think>
+                <loop/>
+            </li>
+        </condition>
+    </template>
+</category>
+
+
+</aiml>

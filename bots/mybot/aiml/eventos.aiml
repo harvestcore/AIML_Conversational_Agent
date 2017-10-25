@@ -1,0 +1,802 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+
+<!-- AGREGAR EVENTO -->
+<category>
+    <pattern># [crea+ agrega+] # evento #</pattern>
+    <template>Perfecto, dime el titulo.</template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>PERFECTO, DIME EL TITULO</that>
+        <template>
+            <think>
+                <set name="titulo"><srai> ponerbarrabaja <star index="1"/> </srai></set>
+            </think>
+            Dime ahora la fecha.
+        </template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>DIME AHORA LA FECHA</that>
+        <template>
+            <think>
+                <set var="fecha"><srai> quitarslash <star index="1"/> </srai></set>
+                <set var="ok"><srai>VALIDDATE <get var="fecha"/> </srai></set>
+            </think>
+            <condition var="ok">
+                <li value="YES">
+                    <think>
+                        <set name="fecha"><srai> ponerslash <get var="fecha"/> </srai></set>
+                    </think>
+                    Dime la hora.
+                </li>
+                <li>La fecha no es correcta.</li>
+            </condition>
+        </template>
+</category>
+
+<category>
+    <pattern>* de * de *</pattern>
+    <that>DIME AHORA LA FECHA</that>
+        <template>
+            <think>
+                <set var="dia"><star index="1"/></set>
+                <set var="mes"><map name="meses"><star index="2"/></map></set>
+                <set var="anno"><star index="3"/></set>
+                <set name="fecha"><srai> ponerslash <get var="dia"/> <get var="mes"/> <get var="anno"/> </srai></set>
+            </think>
+            Dime la hora.
+        </template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>DIME LA HORA</that>
+        <template>
+            <think>
+                <set name="hora_entrada"><star index="1"/></set>
+                <set name="hora_guion"><srai> quitardospuntos <get name="hora_entrada"/> </srai></set>
+                <set name="hora_guion"><srai> ponerguion <get name="hora_guion"/> </srai></set>
+                <set name="hora"><map name="hora"><get name="hora_guion"/></map></set>
+            </think>
+
+            <condition name="hora">
+                <li value="unknown">La hora no es correcta.</li>
+                <li>
+                    <think>
+                        <set name="fecha_hora"><srai> ponerbarrabaja <get name="fecha"/> <get name="hora"/> </srai></set>
+                        <set var="esta"><map name="hora"><get name="fecha_hora"/></map></set>
+                    </think>
+
+                    <condition var="esta">
+                        <li value="unknown">
+                            <addtomap>
+                                <name>evento</name>
+                                <key><get name="fecha_hora"/></key>
+                                <value><get name="titulo"/></value>
+                            </addtomap>
+                            <addtomap>
+                                <name>evento_contactos</name>
+                                <key><get name="fecha_hora"/></key>
+                                <value>#</value>
+                            </addtomap>
+                            Quieres agregar contactos?
+                        </li>
+                        <li>Ya tienes una cita en esa fecha y hora.</li>
+                    </condition>
+                </li>
+            </condition>
+        </template>
+</category>
+
+<category>
+    <pattern>si</pattern>
+    <that>QUIERES AGREGAR CONTACTOS</that>
+        <template>
+            Dime el apellido a agregar.
+        </template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>DIME EL APELLIDO A AGREGAR</that>
+        <template>
+            <srai>ADDCONTACT <star/> TOKEY <get name="fecha_hora"/> </srai>
+            Quieres agregar otro?
+        </template>
+</category>
+
+<category>
+    <pattern>si</pattern>
+    <that>QUIERES AGREGAR OTRO</that>
+        <template>
+            Dime el apellido a agregar.
+        </template>
+</category>
+
+<category>
+    <pattern>no</pattern>
+    <that>QUIERES AGREGAR CONTACTOS</that>
+    <template>
+        Evento creado correctamente.
+    </template>
+</category>
+
+<category>
+    <pattern>no</pattern>
+    <that>QUIERES AGREGAR OTRO</that>
+    <template>
+        Evento creado correctamente.
+    </template>
+</category>
+<!-- FIN AGREGAR EVENTO -->
+
+
+<!-- BORRAR EVENTO -->
+<category>
+    <pattern># borra+ # evento #</pattern>
+    <template>Dime la fecha del evento a borrar.</template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>DIME LA FECHA DEL EVENTO A BORRAR</that>
+    <template>
+        <think>
+            <set name="fecha_evento_borrar"><srai> ponerslash <star index="1"/> </srai></set>
+        </think>
+        Dime la hora del evento que quieres borrar.
+    </template>
+</category> 
+
+<category>
+    <pattern>* de * de *</pattern>
+    <that>DIME LA FECHA DEL EVENTO A BORRAR</that>
+        <template>
+            <think>
+                <set var="dia"><star index="1"/></set>
+                <set var="mes"><map name="meses"><star index="2"/></map></set>
+                <set var="anno"><star index="3"/></set>
+                <set name="fecha_evento_borrar"><srai> ponerslash <get var="dia"/> <get var="mes"/> <get var="anno"/> </srai></set>
+            </think>
+            Dime la hora del evento que quieres borrar.
+        </template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>DIME LA HORA DEL EVENTO QUE QUIERES BORRAR</that>
+    <template>
+        <think>
+            <set var="hora_evento_borrar"><srai> quitardospuntos <star index="1"/> </srai></set>
+            <set var="hora_evento_borrar"><map name="hora"><srai> ponerguion <get var="hora_evento_borrar"/> </srai></map></set>
+            <set name="fecha_hora_borrar"><srai> ponerbarrabaja <get name="fecha_evento_borrar"/> <get var="hora_evento_borrar"/> </srai></set>
+            <set var="existe_evento"><map name="evento"><get name="fecha_hora_borrar"/></map></set>
+        </think>
+        <condition var="existe_evento">
+            <li value="unknown">No existe dicho evento.</li>
+            <li>Esta usted seguro?</li>
+        </condition>
+    </template>
+</category>
+
+<category>
+    <pattern>si</pattern>
+    <that>ESTA USTED SEGURO</that>
+    <template>
+        <removefrommap>
+            <name>evento</name>
+            <key><get name="fecha_hora_borrar"/></key>
+        </removefrommap>
+
+        <removefrommap>
+            <name>evento_contactos</name>
+            <key><get name="fecha_hora_borrar"/></key>
+        </removefrommap>
+
+        Evento borrado.
+    </template>
+</category> 
+
+<category>
+    <pattern>no</pattern>
+    <that>ESTA USTED SEGURO</that>
+    <template>Evento no borrado.</template>
+</category>
+<!-- FIN BORRAR EVENTO -->
+
+
+<!-- MODIFICAR EVENTO -->
+<category>
+    <pattern># modificar # evento #</pattern>
+    <template>Claro, dime la fecha del evento.</template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>CLARO, DIME LA FECHA DEL EVENTO</that>
+    <template>
+        <think>
+            <set name="fecha_evento_modificar"><srai> ponerslash <star/> </srai></set>
+        </think>
+        Ahora dime la hora del evento a modificar.
+    </template>
+</category>
+
+<category>
+    <pattern>* de * de *</pattern>
+    <that>CLARO, DIME LA FECHA DEL EVENTO</that>
+        <template>
+            <think>
+                <set var="dia"><star index="1"/></set>
+                <set var="mes"><map name="meses"><star index="2"/></map></set>
+                <set var="anno"><star index="3"/></set>
+                <set name="fecha_evento_modificar"><srai> ponerslash <get var="dia"/> <get var="mes"/> <get var="anno"/> </srai></set>
+            </think>
+            Ahora dime la hora del evento a modificar.
+        </template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>AHORA DIME LA HORA DEL EVENTO A MODIFICAR</that>
+    <template>
+        <think>
+            <set name="hora_evento_modificar"><map name="hora"><srai> ponerguion <srai> quitardospuntos <star index="1"/> </srai> </srai></map></set>
+            <set name="KEY_modificar"><srai> ponerbarrabaja <get name="fecha_evento_modificar"/> <get name="hora_evento_modificar"/> </srai></set>
+            <set var="existe_evento"><map name="evento"><get name="KEY_modificar"/></map></set>
+        </think>
+        <condition var="existe_evento">
+            <li value="unknown">No existe dicho evento.</li>
+            <li>Que quieres modificar del evento?</li>
+        </condition>
+    </template>
+</category>
+
+<category>
+    <pattern># titulo #</pattern>
+    <that>QUE QUIERES MODIFICAR DEL EVENTO</that>
+    <template>Dime el nuevo titulo del evento.</template>
+</category>
+
+<category>
+    <pattern># fecha #</pattern>
+    <that>QUE QUIERES MODIFICAR DEL EVENTO</that>
+    <template>Dime la nueva fecha del evento.</template>
+</category>
+
+<category>
+    <pattern># hora #</pattern>
+    <that>QUE QUIERES MODIFICAR DEL EVENTO</that>
+    <template>Dime la nueva hora del evento.</template>
+</category>
+
+<category>
+    <pattern># vincular # contacto+ #</pattern>
+    <that>QUE QUIERES MODIFICAR DEL EVENTO</that>
+    <template>Dime el apellido del contacto a agregar.</template>
+</category>
+
+<category>
+    <pattern># desvincular # contacto+ #</pattern>
+    <that>QUE QUIERES MODIFICAR DEL EVENTO</that>
+    <template>Dime el apellido del contacto a borrar.</template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>DIME EL NUEVO TITULO DEL EVENTO</that>
+        <template>
+            <think>
+                <modifymap>
+                    <name>evento</name>
+                    <key><get name="KEY_modificar"/></key>
+                    <value><srai> ponerbarrabaja <star index="1"/> </srai></value>
+                </modifymap>
+            </think>
+            Evento modificado correctamente.
+        </template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>DIME LA NUEVA FECHA DEL EVENTO</that>
+        <template>
+            <think>
+                <set var="antigua_fecha"><get name="fecha_evento_modificar"/></set>
+                <set var="antigua_hora"><get name="hora_evento_modificar"/></set>
+                <set var="antigua_key"><srai> ponerbarrabaja <get var="antigua_fecha"/> <get var="antigua_hora"/> </srai></set>
+                <set var="antiguos_contactos"><map name="evento_contactos"><get var="antigua_key"/></map></set>
+                <set var="antiguo_titulo"><map name="evento"><get var="antigua_key"/></map></set>
+
+                <set var="nueva_fecha"><srai> ponerslash <star index="1"/> </srai></set>
+                <set var="nueva_key"><srai> ponerbarrabaja <get var="nueva_fecha"/> <get var="antigua_hora"/> </srai></set>
+
+                <removefrommap>
+                    <name>evento</name>
+                    <key><get var="antigua_key"/></key>
+                </removefrommap>
+
+                <removefrommap>
+                    <name>evento_contactos</name>
+                    <key><get var="antigua_key"/></key>
+                </removefrommap>
+
+                <addtomap>
+                    <name>evento</name>
+                    <key><get var="nueva_key"/></key>
+                    <value><get var="antiguo_titulo"/></value>
+                </addtomap>
+
+                <addtomap>
+                    <name>evento_contactos</name>
+                    <key><get var="nueva_key"/></key>
+                    <value><get var="antiguos_contactos"/></value>
+                </addtomap>
+
+            </think>
+            Evento modificado correctamente.
+        </template>
+</category>
+
+<category>
+    <pattern>* de * de *</pattern>
+    <that>DIME LA NUEVA FECHA DEL EVENTO</that>
+        <template>
+            <think>
+                <set var="antigua_fecha"><get name="fecha_evento_modificar"/></set>
+                <set var="antigua_hora"><get name="hora_evento_modificar"/></set>
+                <set var="antigua_key"><srai> ponerbarrabaja <get var="antigua_fecha"/> <get var="antigua_hora"/> </srai></set>
+                <set var="antiguos_contactos"><map name="evento_contactos"><get var="antigua_key"/></map></set>
+                <set var="antiguo_titulo"><map name="evento"><get var="antigua_key"/></map></set>
+
+                <set var="dia"><star index="1"/></set>
+                <set var="mes"><map name="meses"><star index="2"/></map></set>
+                <set var="anno"><star index="3"/></set>
+                <set var="nueva_fecha"><srai> ponerslash <get var="dia"/> <get var="mes"/> <get var="anno"/> </srai></set>
+                <set var="nueva_key"><srai> ponerbarrabaja <get var="nueva_fecha"/> <get var="antigua_hora"/> </srai></set>
+
+                <removefrommap>
+                    <name>evento</name>
+                    <key><get var="antigua_key"/></key>
+                </removefrommap>
+
+                <removefrommap>
+                    <name>evento_contactos</name>
+                    <key><get var="antigua_key"/></key>
+                </removefrommap>
+
+                <addtomap>
+                    <name>evento</name>
+                    <key><get var="nueva_key"/></key>
+                    <value><get var="antiguo_titulo"/></value>
+                </addtomap>
+
+                <addtomap>
+                    <name>evento_contactos</name>
+                    <key><get var="nueva_key"/></key>
+                    <value><get var="antiguos_contactos"/></value>
+                </addtomap>
+
+            </think>
+            Evento modificado correctamente.
+        </template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>DIME LA NUEVA HORA DEL EVENTO</that>
+        <template>
+            <think>
+                <set var="antigua_fecha"><get name="fecha_evento_modificar"/></set>
+                <set var="antigua_hora"><get name="hora_evento_modificar"/></set>
+                <set var="antigua_key"><srai> ponerbarrabaja <get var="antigua_fecha"/> <get var="antigua_hora"/> </srai></set>
+                <set var="antiguos_contactos"><map name="evento_contactos"><get var="antigua_key"/></map></set>
+                <set var="antiguo_titulo"><map name="evento"><get var="antigua_key"/></map></set>
+
+                <set var="nueva_hora"><map name="hora"><srai> ponerguion <srai> quitardospuntos <star index="1"/> </srai> </srai> </map></set>
+                <set var="nueva_key"><srai> ponerbarrabaja <get var="antigua_fecha"/> <get var="nueva_hora"/> </srai></set>
+
+                <removefrommap>
+                    <name>evento</name>
+                    <key><get var="antigua_key"/></key>
+                </removefrommap>
+
+                <removefrommap>
+                    <name>evento_contactos</name>
+                    <key><get var="antigua_key"/></key>
+                </removefrommap>
+
+                <addtomap>
+                    <name>evento</name>
+                    <key><get var="nueva_key"/></key>
+                    <value><get var="antiguo_titulo"/></value>
+                </addtomap>
+
+                <addtomap>
+                    <name>evento_contactos</name>
+                    <key><get var="nueva_key"/></key>
+                    <value><get var="antiguos_contactos"/></value>
+                </addtomap>
+            </think>
+            Evento modificado correctamente.
+        </template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+    <that>DIME EL APELLIDO DEL CONTACTO A AGREGAR</that>
+        <template>
+            <srai>ADDCONTACT <star/> TOKEY <get name="KEY_modificar"/> </srai>
+            Quieres agregar otro contacto al evento? 
+        </template>
+</category>
+
+<category>
+    <pattern>si</pattern>
+    <that>QUIERES AGREGAR OTRO CONTACTO AL EVENTO</that>
+        <template>
+            Dime el apellido del contacto a agregar.
+        </template>
+</category>
+
+<category>
+    <pattern>no</pattern>
+    <that>QUIERES AGREGAR OTRO CONTACTO AL EVENTO</that>
+        <template>
+            Evento modificado correctamente.
+        </template>
+</category>
+
+
+<category>
+    <pattern>*</pattern>
+    <that>DIME EL APELLIDO DEL CONTACTO A BORRAR</that>
+        <template>
+            <srai>DELETECONTACT <star/> FROMKEY <get name="KEY_modificar"/> </srai>
+            Quieres borrar otro contacto del evento? 
+        </template>
+</category>
+
+<category>
+    <pattern>si</pattern>
+    <that>QUIERES BORRAR OTRO CONTACTO DEL EVENTO</that>
+        <template>
+            Dime el apellido del contacto a borrar.
+        </template>
+</category>
+
+<category>
+    <pattern>no</pattern>
+    <that>QUIERES BORRAR OTRO CONTACTO DEL EVENTO</that>
+        <template>
+            Evento modificado correctamente.
+        </template>
+</category>
+<!-- FIN MODIFICAR EVENTO -->
+
+
+<!-- CONTACTOS ALMACENADOS EVENTO -->
+<category>
+    <pattern># asistentes # evento #</pattern>
+        <template>Dime la fecha del evento a consultar.</template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+        <that>DIME LA FECHA DEL EVENTO A CONSULTAR</that>
+        <template>
+            <think>
+                <set name="fecha_consulta"><srai> ponerslash <star/> </srai></set>
+            </think>
+            Dime la hora del evento a consultar.
+        </template>
+</category>
+
+<category>
+    <pattern>* de * de *</pattern>
+        <that>DIME LA FECHA DEL EVENTO A CONSULTAR</that>
+        <template>
+            <think>
+                <set var="dia"><star index="1"/></set>
+                <set var="mes"><map name="meses"><star index="2"/></map></set>
+                <set var="anno"><star index="3"/></set>
+                <set name="fecha_consulta"><srai> ponerslash <get var="dia"/> <get var="mes"/> <get var="anno"/> </srai></set>
+            </think>
+            Dime la hora del evento a consultar.
+        </template>
+</category>
+
+<category>
+    <pattern>*</pattern>
+        <that>DIME LA HORA DEL EVENTO A CONSULTAR</that>
+        <template>
+            <think>
+                <set name="hora_consulta"><srai> ponerguion <srai> quitardospuntos <star index="1"/> </srai> </srai></set>
+                <set name="hora_consulta"><map name="hora"><get name="hora_consulta"/></map></set>
+                <set name="key_consulta"><srai> ponerbarrabaja <get name="fecha_consulta"/> <get name="hora_consulta"/> </srai></set>
+                <set name="existe_consulta"><map name="evento"><get name="key_consulta"/></map></set>
+            </think>
+            <condition name="existe_consulta">
+                <li value="unknown">No existe ningun evento con esos datos.</li>
+                <li>
+                    El evento tiene <map name="predecessor"><srai>COUNT <srai> quitarslash <map name="evento_contactos"> <get name="key_consulta"/></map> </srai> </srai></map> contacto/s asociado/s.
+                </li>
+            </condition>
+        </template>
+</category>
+<!-- FIN CONTACTOS ALMACENADOS EVENTO -->
+
+
+<!-- NUMERO EVENTOS -->
+<category>
+    <pattern># numero # eventos # hoy #</pattern>
+        <template>
+            <think>
+                <set var="hoy"><date jformat="dd/MM/yyyy"/></set>
+                <set var="numero_eventos"><srai>COUNTEVENTS <get var="hoy"/> </srai></set>
+            </think>
+            Hoy tienes <get var="numero_eventos"/> evento/s.
+        </template>
+</category>
+
+<category>
+    <pattern># numero # eventos # [manana mañana maniana] #</pattern>
+        <template>
+            <think>
+                <set var="hoy"><date jformat="dd/MM/yyyy"/></set>
+                <set var="tomorrow"><srai>TOMORROW <srai> quitarslash <get var="hoy"/></srai> </srai></set>
+                <set var="numero_eventos"><srai>COUNTEVENTS <get var="tomorrow"/> </srai></set>
+            </think>
+            Manana tienes <get var="numero_eventos"/> evento/s.
+        </template>
+</category>
+
+<category>
+    <pattern># numero # eventos # dia # *</pattern>
+        <template>
+            <think>
+                <set var="fecha"><srai> ponerslash <star index="4"/> </srai></set>
+                <set var="numero_eventos"><srai>COUNTEVENTS <get var="fecha"/> </srai></set>
+            </think>
+            El dia <get var="fecha"/> tienes <get var="numero_eventos"/> evento/s.
+        </template>
+</category>
+
+<category>
+    <pattern># numero # eventos # dia # * de * de *</pattern>
+        <template>
+            <think>
+                <set var="dia"><star index="5"/></set>
+                <set var="mes"><map name="meses"><star index="6"/></map></set>
+                <set var="anno"><star index="7"/></set>
+                <set name="fecha_consulta"><srai> ponerslash <get var="dia"/> <get var="mes"/> <get var="anno"/> </srai></set>
+                <set var="numero_eventos"><srai>COUNTEVENTS <get name="fecha_consulta"/> </srai></set>
+            </think>
+            El dia <get name="fecha_consulta"/> tienes <get var="numero_eventos"/> evento/s.
+        </template>
+</category>
+<!-- FIN NUMERO EVENTOS -->
+
+
+<!-- QUE EVENTOS TENGO -->
+<category>
+    <pattern># listar # eventos # hoy #</pattern>
+        <template>
+            <think>
+                <set var="hoy"><date jformat="dd/MM/yyyy"/></set>
+                <set var="numero_eventos"><srai>COUNTEVENTS <get var="hoy"/> </srai></set>
+            </think>
+            <condition var="numero_eventos">
+                <li value="0">Hoy no tienes ningun evento.</li>
+                <li>
+                    Hoy tienes <get var="numero_eventos"/> evento/s y son los siguientes <srai>GETEVENTS <get var="hoy"/> </srai>.
+                </li>
+            </condition>
+        </template>
+</category>
+
+<category>
+    <pattern># listar # eventos # [manana mañana maniana] #</pattern>
+        <template>
+            <think>
+                <set var="hoy"><date jformat="dd/MM/yyyy"/></set>
+                <set var="tomorrow"><srai>TOMORROW <srai> quitarslash <get var="hoy"/></srai> </srai></set>
+                <set var="numero_eventos"><srai>COUNTEVENTS <get var="tomorrow"/> </srai></set>
+            </think>
+            <condition var="numero_eventos">
+                <li value="0">Manana no tienes ningun evento.</li>
+                <li>
+                    Manana tienes <get var="numero_eventos"/> evento/s y son los siguientes <srai>GETEVENTS <get var="tomorrow"/> </srai>.
+                </li>
+            </condition>
+        </template>
+</category>
+
+<category>
+    <pattern># listar # eventos # dia # * de * de *</pattern>
+        <template>
+            <think>
+                <set var="dia"><star index="5"/></set>
+                <set var="mes"><map name="meses"><star index="6"/></map></set>
+                <set var="anno"><star index="7"/></set>
+                <set name="fecha_consulta"><srai> ponerslash <get var="dia"/> <get var="mes"/> <get var="anno"/> </srai></set>
+                <set var="numero_eventos"><srai>COUNTEVENTS <get name="fecha_consulta"/> </srai></set>
+            </think>
+            <condition var="numero_eventos">
+                <li value="0">El dia <get name="fecha_consulta"/> no tienes ningun evento.</li>
+                <li>
+                    El dia <get name="fecha_consulta"/> tienes <get var="numero_eventos"/> evento/s y son los siguientes <srai>GETEVENTS <get name="fecha_consulta"/> </srai>.
+                </li>
+            </condition>
+        </template>
+</category>
+<!-- FIN QUE EVENTOS TENGO -->
+
+
+<!-- TENGO EL DIA LIBRE -->
+<category>
+    <pattern># tengo el dia libre #</pattern>
+        <template>
+            <think>
+                <set var="hoy"><date jformat="dd/MM/yyyy"/></set>
+                <set var="numero_eventos"><srai>COUNTEVENTS <get var="hoy"/> </srai></set>
+            </think>
+            <condition var="numero_eventos">
+                <li value="0">Enhorabuena, hoy tienes el dia libre.</li>
+                <li>
+                    Por desgracia hoy tienes <get var="numero_eventos"/> evento/s.
+                </li>
+            </condition>
+        </template>
+</category>
+<!-- FIN TENGO EL DIA LIBRE -->
+
+<!-- PROXIMO EVENTO -->
+<category>
+    <pattern># proxim+ # evento+ # hoy #</pattern>
+        <template>
+            <think>
+                <set var="hoy"><date jformat="dd/MM/yyyy"/></set>
+                <set var="hora"><date jformat="hh"/></set>
+                <set var="mins"><date jformat="mm"/></set>
+                <set var="hora_min_consulta"><srai> ponerguion <get var="hora"/> <get var="mins"/> </srai> </set>
+                <set var="eventos"><srai>GETEVENTDAY <get var="hoy"/> AFTER <get var="hora_min_consulta"/></srai></set>
+            </think>
+
+            <condition var="eventos">
+                <li value="unknown">Hoy no tienes ningún evento pendiente.</li>
+                <li>Proximo evento pendiente: <get var="eventos"/> a las <srai> ponerpuntos <srai> quitarguion <get name="hora_prox_evento"/></srai> </srai>. </li>
+            </condition>
+        </template>
+</category>
+
+<category>
+    <pattern># proxim+ # evento+ # [manana mañana maniana] #</pattern>
+        <template>
+            <think>
+                <set var="hoy"><date jformat="dd/MM/yyyy"/></set>
+                <set var="maniana"><srai> ponerslash <srai> TOMORROW <srai> quitarslash <get var="hoy"/> </srai> </srai> </srai></set>
+                <set var="hora_min_consulta"><srai> ponerguion <get var="hora"/> <get var="mins"/> </srai> </set>
+                <set var="eventos"><srai>GETFIRSTEVENT <get var="maniana"/></srai></set>
+            </think>
+
+            <condition var="eventos">
+                <li value="unknown">Maniana no tienes ningun evento pendiente.</li>
+                <li>Maniana tienes: <get var="eventos"/> a las <srai> ponerpuntos <srai> quitarguion <get name="hora_prox_evento"/></srai> </srai>. </li>
+            </condition>
+        </template>
+</category>
+
+<category>
+    <pattern># proxim+ # evento+ # dia *</pattern>
+        <template>
+            <think>
+                <set var="fecha"><srai> quitarslash <star index="4"/> </srai></set>
+                <set var="fecha"><srai> ponerslash <get var="fecha"/> </srai></set>
+                <set var="eventos"><srai>GETFIRSTEVENT <get var="fecha"/></srai></set>
+            </think>
+
+            <condition var="eventos">
+                <li value="unknown">El dia <get var="fecha"/> no tienes ningún evento pendiente.</li>
+                <li>Proximo evento pendiente del dia <get var="fecha"/>: <get var="eventos"/> a las <srai> ponerpuntos <srai> quitarguion <get name="hora_prox_evento"/></srai> </srai>. </li>
+            </condition>
+        </template>
+</category>
+
+<category>
+    <pattern># proxim+ # evento+ # dia * de * de *</pattern>
+        <template>
+            <think>
+                <set var="dia"><star index="4"/></set>
+                <set var="mes"><map name="meses"><star index="5"/></map></set>
+                <set var="anno"><star index="6"/></set>
+                <set name="fecha_consulta"><srai> ponerslash <get var="dia"/> <get var="mes"/> <get var="anno"/> </srai></set>
+                <set var="eventos"><srai>GETFIRSTEVENT <get name="fecha_consulta"/></srai></set>
+            </think>
+
+            <condition var="eventos">
+                <li value="unknown">El dia <get name="fecha_consulta"/> no tienes ningún evento pendiente.</li>
+                <li>Proximo evento pendiente del dia <get name="fecha_consulta"/>: <get var="eventos"/> a las <srai> ponerpuntos <srai> quitarguion <get name="hora_prox_evento"/></srai> </srai>. </li>
+            </condition>
+        </template>
+</category>
+<!-- FIN PROXIMO EVENTO -->
+
+
+<!-- ULTIMO EVENTO -->
+<category>
+    <pattern># ultimo # evento+ # hoy #</pattern>
+        <template>
+            <think>
+                <set var="hoy"><date jformat="dd/MM/yyyy"/></set>
+                <set var="hora"><date jformat="hh"/></set>
+                <set var="mins"><date jformat="mm"/></set>
+                <set var="hora_min_consulta"><srai> ponerguion <get var="hora"/> <get var="mins"/> </srai> </set>
+                <set var="eventos"><srai>GETLASTEVENT <get var="hoy"/></srai></set>
+            </think>
+
+            <condition var="eventos">
+                <li value="unknown">Hoy no tienes ningún evento pendiente.</li>
+                <li>Último evento pendiente del día: <get var="eventos"/> a las <srai> ponerpuntos <srai> quitarguion <get name="hora_prox_evento"/></srai> </srai>. </li>
+            </condition>
+        </template>
+</category>
+
+<category>
+    <pattern># ultimo # evento+ # [manana mañana maniana] #</pattern>
+        <template>
+            <think>
+                <set var="hoy"><date jformat="dd/MM/yyyy"/></set>
+                <set var="maniana"><srai> ponerslash <srai> TOMORROW <srai> quitarslash <get var="hoy"/> </srai> </srai> </srai></set>
+                <set var="hora_min_consulta"><srai> ponerguion <get var="hora"/> <get var="mins"/> </srai> </set>
+                <set var="eventos"><srai>GETLASTEVENT <get var="maniana"/></srai></set>
+            </think>
+
+            <condition var="eventos">
+                <li value="unknown">Maniana no tienes ningun evento pendiente.</li>
+                <li>Último evento de maniana: <get var="eventos"/> a las <srai> ponerpuntos <srai> quitarguion <get name="hora_prox_evento"/></srai> </srai>. </li>
+            </condition>
+        </template>
+</category>
+
+<category>
+    <pattern># ultimo # evento+ # dia * de * de *</pattern>
+        <template>
+            <think>
+                <set var="dia"><star index="4"/></set>
+                <set var="mes"><map name="meses"><star index="5"/></map></set>
+                <set var="anno"><star index="6"/></set>
+                <set name="fecha_consulta"><srai> ponerslash <get var="dia"/> <get var="mes"/> <get var="anno"/> </srai></set>
+                <set var="eventos"><srai>GETLASTEVENT <get name="fecha_consulta"/></srai></set>
+            </think>
+
+            <condition var="eventos">
+                <li value="unknown">El dia <get name="fecha_consulta"/> no tienes ningún evento pendiente.</li>
+                <li>Último evento del dia <get name="fecha_consulta"/>: <get var="eventos"/> a las <srai> ponerpuntos <srai> quitarguion <get name="hora_prox_evento"/></srai> </srai>. </li>
+            </condition>
+        </template>
+</category>
+<!-- FIN ULTIMO EVENTO -->
+
+<!-- REUNION -->
+<category>
+    <pattern># tengo # reun+ # hoy</pattern>
+        <template>
+            <think>
+                <set var="hoy"><date jformat="dd/MM/yyyy"/></set>
+                <set var="numero_eventos"><srai>COUNTEVENTS <get var="hoy"/></srai></set>
+            </think>
+
+            <condition var="numero_eventos">
+                <li value="0">Hoy no tienes que reunirte con nadie.</li>
+                <li>Hoy tienes los siguientes eventos: <srai>GETEVENTS <get var="hoy"/></srai></li>
+            </condition>
+        </template>
+</category>
+<!-- FIN REUNION -->
+
+</aiml>

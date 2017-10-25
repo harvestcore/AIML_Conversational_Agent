@@ -1,0 +1,13 @@
+url:http://www.twitter.com/botperrete
+name:BotPerrete
+email:hafelbusiness@gmail.com
+gender:dog
+botmaster:Angel	
+organization:HafelBusiness
+version:0.0.5
+age:2
+job:dogger
+color:verde
+
+
+
