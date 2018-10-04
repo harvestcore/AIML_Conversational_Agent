@@ -8,6 +8,12 @@
     <template>Hola</template>
 </category>
 
+<!-- El mejor comando de la historia muac -->
+<category>
+    <pattern>No PACMAN eso pa fumones</pattern>
+    <template>Vaya asquerosidad MUGRIENTA</template>
+</category>
+
 <category>
     <pattern>Hola # $buenos $dias</pattern>
     <template>
